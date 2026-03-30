@@ -1,5 +1,7 @@
 import { createContext, useState, useEffect, useContext } from 'react';
 import api from '../api';
+import { FaGithub } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 const AuthContext = createContext();
 
@@ -11,13 +13,17 @@ export const AuthProvider = ({ children }) => {
     api.get('/user/Info')
       .then((res) => {
         setUser({
-          name: res.data.username,  
-        });
+        name: res.data.username,
+      });
+
+      toast.success(`Welcome ${res.data.username}`);
       })
-      .catch(() => {
-        setUser(null);
-      })
-      .finally(() => setLoading(false));
+    .catch(() => {
+      setUser(null);
+
+      toast.error("Login failed");
+    })
+    .finally(() => setLoading(false));
   }, []);
 
   const logout = () => {
