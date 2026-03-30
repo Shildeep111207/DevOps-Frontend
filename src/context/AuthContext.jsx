@@ -27,7 +27,7 @@ useEffect(() => {
       setUser(null);
 
     })
-    .finally(() => setLoading(false));
+    .finally(() => setLoading(false))
 }, []);
 
   const logout = () => {
