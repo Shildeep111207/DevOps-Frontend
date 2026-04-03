@@ -49,14 +49,14 @@ const Planning = () => {
 
   //  GANTT
   useEffect(() => {
-    if (!selectedProject?.tasks?.length) return;
+    if (!selectedProject) return;
 
     const container = document.getElementById("gantt");
     if (!container) return;
 
     container.innerHTML = "";
 
-    const tasks = selectedProject.tasks.map((t) => ({
+    const tasks = (selectedProject.tasks || []).map((t) => ({
       id: t.id,
       name: t.title,
       start: t.startDate,
@@ -64,7 +64,10 @@ const Planning = () => {
       progress: t.status === "Done" ? 100 : 40,
     }));
 
-    new Gantt("#gantt", tasks);
+    if (tasks.length > 0) {
+      new Gantt("#gantt", tasks);
+    }
+
   }, [selectedProject]);
 
   //  CREATE PROJECT (FIXED)
@@ -127,7 +130,12 @@ const handleAddMember = async () => {
     //  ONLY reset AFTER SUCCESS
     setMember({ name: "", role: "" });
 
-    await refresh();
+    const res = await getProjects();
+    setProjects(res.data);
+
+    // 🔥 update selected project with fresh data
+    const updated = res.data.find(p => p.id === selectedProject.id);
+    setSelectedProject(updated);
 
   } catch (err) {
     console.error(err);
@@ -177,7 +185,11 @@ const handleAddTask = async () => {
       memberId: "",
     });
 
-    await refresh();
+    const res = await getProjects();
+    setProjects(res.data);
+
+    const updated = res.data.find(p => p.id === selectedProject.id);
+    setSelectedProject(updated);
 
   } catch (err) {
     console.error("Task error:", err);
